@@ -23,13 +23,14 @@ class GerenciadorDeCenas:
 
 # Inicialização do Pygame
 pygame.init()
-tela = pygame.display.set_mode((800,600))
+tela = pygame.display.set_mode((1600,600))
+# tela = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
 pygame.display.set_caption("Eletrifica Kids")
 clock = pygame.time.Clock()
 
 # Gerenciador de cenas
 gerenciador = GerenciadorDeCenas()
-gerenciador.mudar_cena(TelaInicial())
+gerenciador.mudar_cena(Fase1())
 
 rodando = True
 while rodando:
