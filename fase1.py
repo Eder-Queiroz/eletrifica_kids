@@ -1,26 +1,45 @@
 import pygame as pg
 
 class Componente:
-    def __init__(self, nome, cor, pos):
+    def __init__(self, nome, imagem_path, tam_x, tam_y, pos):
         self.nome = nome
-        self.cor = cor
         self.pos = pos
-        self.ret = pg.Rect(pos[0], pos[1], 100, 60)
+        self.imagem = pg.image.load(imagem_path).convert_alpha()
+        self.imagem = pg.transform.scale(self.imagem, (tam_x,tam_y))
+        if self.nome == 'Tomada':
+            self.imagem = pg.transform.rotate(self.imagem, 180)
+        elif self.nome == 'Interruptor':
+            self.imagem = pg.transform.rotate(self.imagem, 90)
+        
+        if self.nome == 'Lampada':
+            self.ret = self.imagem.get_rect(center=pos)
+        else:
+            self.ret = self.imagem.get_rect(topleft=pos)
 
     def desenhar(self, tela):
-        pg.draw.rect(tela, self.cor, self.ret)
+        tela.blit(self.imagem, self.ret.topleft)
         fonte = pg.font.SysFont(None, 24)
         texto = fonte.render(self.nome, True, (0, 0, 0))
         # copiando um conteudo grafico para a tela e ajustando sua posicao, no caso a posicao do texto
-        tela.blit(texto, (self.pos[0] + 10, self.pos[1] + 20)) 
+        tela.blit(texto, (self.pos[0] + 10, self.pos[1] + 40)) # abaixo da imagem 
        
 class Fase1:
-    def __init__(self):
+    def __init__(self, largura, altura):
+        self.largura = largura
+        self.altura = altura
+
+        # Tamanhos dos componentes
+        largura_carga, altura_carga = 60, 100
+        largura_lamp, altura_lamp = 100, 80
+        largura_int, altura_int = 90, 90
+        largura_tom, altura_tom = 90, 90    
+
+
         self.componentes = [
-            Componente("Centro de Carga", (255, 100, 100), (0, 300)),
-            Componente("Lâmpada",         (255, 100, 100), (350, 250)),
-            Componente("Interruptor",     (255, 100, 100), (700, 300)),
-            Componente("Tomada",          (255, 100, 100), (150, 0)),
+            Componente("Centro de Carga", "assets/centro_de_cargas.png", largura_carga, altura_carga, (0, altura // 2 - altura_carga // 2)),
+            Componente("Lâmpada",         "assets/lampada.png", largura_lamp, altura_lamp, (largura // 2, altura // 2)),
+            Componente("Interruptor",  "assets/interruptor_simples.png", largura_int, altura_int, (largura - largura_int, altura // 2 - altura_int // 2)),
+            Componente("Tomada",       "assets/tomada_intermediaria.png", largura_tom, altura_tom, (largura // 2 - largura_tom // 2, 0)),
         ]
 
         # Imagens: 
@@ -32,27 +51,20 @@ class Fase1:
         self.img_fft = pg.transform.scale(self.img_fft, (50,50))
         self.img_fr = pg.transform.scale(self.img_fr, (50,50))
         self.fnt_usada = False
-
-        # Fazer ainda
         self.fft_usada = False
         self.fr_usada = False
 
-        # Retangulo da imagem
+        # Retangulo da imagem condutores
         self.rect_fnt = self.img_fnt.get_rect(topleft=(700, 100))
-
-
         self.rect_fft = self.img_fft.get_rect(topleft=(500, 100))
         self.rect_fr =  self.img_fr.get_rect(topleft=(300, 100))
 
         #Estado de arrasto
         self.arrastando_fnt = False
-
-
         self.arrastando_fft = False
         self.arrastando_fr = False
 
         self.fios = [] # planejando ser uma tupla de fios que ira fazer a conexao
-
         self.selecao = None # primeiro clique
 
     def atualizar(self, eventos):
@@ -114,30 +126,6 @@ class Fase1:
                                 fio["imagem"] = self.img_fr
                                 self.fr_usada = True
                                 break
-
-
-                # # ponto_solto = self.rect_fnt.center
-
-                # for fio in self.fios:
-                #     nomes = {fio["origem"].nome, fio["destino"].nome}
-                    
-                #     # Só permitir colocar a imagem entre Lâmpada e Interruptor
-                #     if nomes == {"Lâmpada", "Interruptor"}:
-                #         origem = fio["origem"]
-                #         destino = fio["destino"]
-                #         centro1 = origem.ret.center
-                #         centro2 = destino.ret.center
-
-                #         # Calcular a distancia do centro da imagem até o meio do fio
-                #         meio = ((centro1[0] + centro2[0]) // 2, (centro1[1] + centro2[1]) // 2)
-                #         dx = self.rect_fnt.centerx - meio[0]
-                #         dy = self.rect_fnt.centery - meio[1]
-                #         distancia = (dx ** 2 + dy ** 2) ** 0.5
-
-                #         if distancia < 50 and fio["imagem"] is None: # tolerancia de 50px
-                #             fio["imagem"] = self.img_fnt  # Salva imagem no fio
-                #             self.fnt_usada = True
-                #             break
 
             elif evento.type == pg.MOUSEMOTION:
                 if self.arrastando_fnt:
