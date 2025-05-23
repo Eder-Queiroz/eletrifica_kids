@@ -37,7 +37,7 @@ class Fase1:
 
         self.componentes = [
             Componente("Centro de Carga", "assets/centro_de_cargas.png", largura_carga, altura_carga, (0, altura // 2 - altura_carga // 2)),
-            Componente("Lâmpada",         "assets/lampada.png", largura_lamp, altura_lamp, (largura // 2, altura // 2)),
+            Componente("Lâmpada",         "assets/lampada.png", largura_lamp, altura_lamp, (largura / 2.3, altura / 2.3)),
             Componente("Interruptor",  "assets/interruptor_simples.png", largura_int, altura_int, (largura - largura_int, altura // 2 - altura_int // 2)),
             Componente("Tomada",       "assets/tomada_intermediaria.png", largura_tom, altura_tom, (largura // 2 - largura_tom // 2, 0)),
         ]
@@ -55,9 +55,9 @@ class Fase1:
         self.fr_usada = False
 
         # Retangulo da imagem condutores
-        self.rect_fnt = self.img_fnt.get_rect(topleft=(700, 100))
-        self.rect_fft = self.img_fft.get_rect(topleft=(500, 100))
-        self.rect_fr =  self.img_fr.get_rect(topleft=(300, 100))
+        self.rect_fnt = self.img_fnt.get_rect(topleft=(largura * 0.25, altura * 0.90))
+        self.rect_fft = self.img_fft.get_rect(topleft=(largura * 0.5, altura * 0.90))
+        self.rect_fr =  self.img_fr.get_rect(topleft=(largura * 0.75, altura * 0.90))
 
         #Estado de arrasto
         self.arrastando_fnt = False
