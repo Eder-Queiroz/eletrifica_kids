@@ -78,12 +78,15 @@ class Fase1:
                         else:
                             # Criar ligação entre os 2
                             if self.selecao != comp and not self.fio_ja_existe(self.selecao, comp):
-                                self.fios.append({
-                                    "origem": comp,
-                                    "destino": self.selecao,
-                                    "imagem": None
+                                if self.conexao_valida(self.selecao, comp):
+                                    self.fios.append({
+                                        "origem": self.selecao,
+                                        "destino": comp,
+                                        "imagem": None
                                     })
-                                print(self.fios)
+                                    # print("Conexão feita:", self.selecao.nome, "→", comp.nome)
+                                # else:
+                                #     # print("Conexão inválida:", self.selecao.nome, "→", comp.nome)
                             self.selecao = None
             
                 if self.rect_fnt.collidepoint(evento.pos):
@@ -152,6 +155,23 @@ class Fase1:
                    (fio["origem"] == c2 and fio["destino"] == c1) 
                    for fio in self.fios
         )
+    
+    def conexao_valida(self, origem, destino):
+        nome1 = origem.nome
+        nome2 = destino.nome
+        nomes = {nome1, nome2}
+
+        # Conexão válida: Centro de Carga <-> Lâmpada (primeiro passo)
+        if nomes == {"Centro de Carga", "Lâmpada"}:
+            return True
+
+        # Só permite Lâmpada -> Interruptor/Tomada se já tiver Lâmpada conectada ao Centro de Carga
+        elif nomes in [{"Lâmpada", "Interruptor"}, {"Lâmpada", "Tomada"}]:
+            for fio in self.fios:
+                if {"Centro de Carga", "Lâmpada"} == {fio["origem"].nome, fio["destino"].nome}:
+                    return True
+        return False
+
     
     def desenhar(self, tela):
         tela.fill((240, 240, 240)) # Fundo branco

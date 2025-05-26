@@ -1,0 +1,7 @@
+TODO:
+
+não deixar o usuario clicar do centro de cargas para tomada e interruptor
+tirar aquele quadrado quando clico na imagem (?)
+verificar se o usuario colocou os condutores corretamente -> informação visual e talvez barulho
+colocar imagem de fundo
+colocar imagem onde ira ficar os condutores (parte inferior da tela)
