@@ -21,17 +21,19 @@ class Componente:
         fonte = pg.font.SysFont(None, 24)
         texto = fonte.render(self.nome, True, (0, 0, 0))
 
-        # Posição padrão (centralizado abaixo da imagem)
+        # Posição padrão do texto (centralizado abaixo da imagem)
         texto_x = self.ret.centerx - (texto.get_width() // 2)
         texto_y = self.ret.bottom + 5
 
-        # Ajustes específicos por componente
+        # Ajustes específicos do texto por componente
         if self.nome == 'Tomada':
             texto_x -= 80
-            texto_y = self.ret.top - texto.get_height() + 30  # acima da imagem
+            texto_y = self.ret.top - texto.get_height() + 40  # acima da imagem
         elif self.nome == 'Centro de Carga':
-            texto_x += 36
+            texto_x += 70
             texto_y += 10  # mais para baixo
+        elif self.nome == 'Interruptor':
+            texto_x -= 20
 
         tela.blit(texto, (texto_x, texto_y))
         # tela.blit(texto, (self.pos[0] + 10, self.pos[1] + 80)) # abaixo da imagem 
@@ -40,7 +42,16 @@ class Fase1:
     def __init__(self, largura, altura):
         self.largura = largura
         self.altura = altura
-        self.espaco_topo = self.altura * 0.1
+
+        # Espaços
+        self.espaco_topo = int(self.altura * 0.1)
+        self.altura_bandeja = 100
+
+        # Carrega a imagem do quarto e redimensiona para o espaço útil
+        altura_fundo = self.altura - self.espaco_topo - self.altura_bandeja
+        self.imagem_fundo = pg.image.load("assets/quarto.png").convert_alpha()
+        self.imagem_fundo = pg.transform.scale(self.imagem_fundo, (self.largura, altura_fundo))
+
 
         # Tamanhos dos componentes
         largura_carga, altura_carga = 60, 100
@@ -50,14 +61,14 @@ class Fase1:
 
 
         self.componentes = [
-            Componente("Centro de Carga", "assets/centro_de_cargas.png", largura_carga, altura_carga, (0, altura // 2 - altura_carga // 2)),
+            Componente("Centro de Carga", "assets/centro_de_cargas.png", largura_carga, altura_carga, (13, altura // 2 - altura_carga // 2)),
             Componente("Lâmpada",         "assets/lampada.png", largura_lamp, altura_lamp, (largura / 2.3, altura / 2.3)),
             Componente("Interruptor",  "assets/interruptor_simples.png", largura_int, altura_int, (largura - largura_int, altura // 2 - altura_int // 2)),
             Componente("Tomada",       "assets/tomada_intermediaria.png", largura_tom, altura_tom, (largura // 2 - largura_tom // 2, self.espaco_topo + 10)),
         ]
 
         # Imagens: 
-        self.img_fnt = pg.image.load("assets/fnt.png").convert_alpha()
+        self.img_fnt = pg.image.load("assets/ffnt.png").convert_alpha()
         self.img_fft = pg.image.load("assets/fft.png").convert_alpha()
         self.img_fr = pg.image.load("assets/fr.png").convert_alpha()
 
@@ -187,12 +198,13 @@ class Fase1:
         return False
 
     
-    def desenhar(self, tela):
-        tela.fill((240, 240, 240)) # Fundo branco
+    def desenhar(self, tela):     
+        tela.blit(self.imagem_fundo, (0, self.espaco_topo))
+        # tela.blit(self.imagem_fundo, (0, 0))
 
         # Nome da fase
         fonte = pg.font.SysFont(None, 36)
-        texto = fonte.render("Fase x - Condutores | Componentes", True, (0,0,0))
+        texto = fonte.render("Fase x - Condutores | Componentes", True, (255,255,255))
         tela.blit(texto, (self.largura // 2 - texto.get_width() // 2, 10))
 
         # Linha separadora abaixo do cabeçalho
