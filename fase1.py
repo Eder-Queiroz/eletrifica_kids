@@ -20,13 +20,27 @@ class Componente:
         tela.blit(self.imagem, self.ret.topleft)
         fonte = pg.font.SysFont(None, 24)
         texto = fonte.render(self.nome, True, (0, 0, 0))
-        # copiando um conteudo grafico para a tela e ajustando sua posicao, no caso a posicao do texto
-        tela.blit(texto, (self.pos[0] + 10, self.pos[1] + 40)) # abaixo da imagem 
+
+        # Posição padrão (centralizado abaixo da imagem)
+        texto_x = self.ret.centerx - (texto.get_width() // 2)
+        texto_y = self.ret.bottom + 5
+
+        # Ajustes específicos por componente
+        if self.nome == 'Tomada':
+            texto_x -= 80
+            texto_y = self.ret.top - texto.get_height() + 30  # acima da imagem
+        elif self.nome == 'Centro de Carga':
+            texto_x += 36
+            texto_y += 10  # mais para baixo
+
+        tela.blit(texto, (texto_x, texto_y))
+        # tela.blit(texto, (self.pos[0] + 10, self.pos[1] + 80)) # abaixo da imagem 
        
 class Fase1:
     def __init__(self, largura, altura):
         self.largura = largura
         self.altura = altura
+        self.espaco_topo = self.altura * 0.1
 
         # Tamanhos dos componentes
         largura_carga, altura_carga = 60, 100
@@ -39,7 +53,7 @@ class Fase1:
             Componente("Centro de Carga", "assets/centro_de_cargas.png", largura_carga, altura_carga, (0, altura // 2 - altura_carga // 2)),
             Componente("Lâmpada",         "assets/lampada.png", largura_lamp, altura_lamp, (largura / 2.3, altura / 2.3)),
             Componente("Interruptor",  "assets/interruptor_simples.png", largura_int, altura_int, (largura - largura_int, altura // 2 - altura_int // 2)),
-            Componente("Tomada",       "assets/tomada_intermediaria.png", largura_tom, altura_tom, (largura // 2 - largura_tom // 2, 0)),
+            Componente("Tomada",       "assets/tomada_intermediaria.png", largura_tom, altura_tom, (largura // 2 - largura_tom // 2, self.espaco_topo + 10)),
         ]
 
         # Imagens: 
@@ -176,6 +190,25 @@ class Fase1:
     def desenhar(self, tela):
         tela.fill((240, 240, 240)) # Fundo branco
 
+        # Nome da fase
+        fonte = pg.font.SysFont(None, 36)
+        texto = fonte.render("Fase x - Condutores | Componentes", True, (0,0,0))
+        tela.blit(texto, (self.largura // 2 - texto.get_width() // 2, 10))
+
+        # Linha separadora abaixo do cabeçalho
+        pg.draw.line(tela, (100, 100, 100), (0, 50), (self.largura, 50), 2)
+
+        # Bandeja inferior para condutores
+        altura_bandeja = 100
+        y_bandeja = self.altura - altura_bandeja
+        pg.draw.rect(tela, (200, 200, 200), (0, y_bandeja, self.largura, altura_bandeja))
+
+        # Título da área de condutores
+        fonte_bandeja = pg.font.SysFont(None, 28)
+        texto = fonte_bandeja.render("Condutores", True, (0, 0, 0))
+        tela.blit(texto, (10, y_bandeja + 10))
+
+
         for fio in self.fios:
             c1 = fio["origem"]
             c2 = fio["destino"]
@@ -190,7 +223,7 @@ class Fase1:
 
         # Destaque seleção
         if self.selecao:
-            pg.draw.rect(tela, (0,0,0), self.selecao.ret, 3)
+            pg.draw.rect(tela, (0, 120, 255), self.selecao.ret.inflate(1, 1), 1)
 
         # Desenha componentes
         for comp in self.componentes:
