@@ -32,13 +32,13 @@ class Fase3:
         # lista de (nome, caminho_absoluto_para_imagem)
         base = os.path.dirname(__file__)
         lista = [
-            ("Int. intermediário", os.path.join(base, "images", "interruptor-intermediario.jpg")),
-            ("Int. paralelo",      os.path.join(base, "images", "interruptor-paralelo.jpg")),
-            ("Int. simples",       os.path.join(base, "images", "interruptor-simples.jpg")),
-            ("Tomada alta",               os.path.join(base, "images", "tomada-alta.jpg")),
-            ("Tomada baixa",              os.path.join(base, "images", "tomada-baixa.jpg")),
-            ("Tomada média",              os.path.join(base, "images", "tomada-media.jpg")),
-            ("Lâmpada",                   os.path.join(base, "images", "lampada.jpg")),
+            ("Int. intermediário", os.path.join(base, "images", "interruptor-intermediario.png")),
+            ("Int. paralelo",      os.path.join(base, "images", "interruptor-paralelo.png")),
+            ("Int. simples",       os.path.join(base, "images", "interruptor-simples.png")),
+            ("Tomada alta",               os.path.join(base, "images", "tomada-alta.png")),
+            ("Tomada baixa",              os.path.join(base, "images", "tomada-baixa.png")),
+            ("Tomada média",              os.path.join(base, "images", "tomada-media.png")),
+            ("Lâmpada",                   os.path.join(base, "images", "lampada.png")),
         ]
 
         # pega dimensões da tela atual
@@ -116,17 +116,19 @@ class Fase3:
             self.selecao.clear()
 
     def desenhar(self, tela):
-        tela.fill((255,255,255))
+        tela.fill((248, 248, 248))
 
         # desenha todas as imagens e labels, matched ou não
         for item in self.items:
-            item.draw(tela)
+            if not item.matched:
+                item.draw(tela)
 
         # desenha linhas verdes conectando pares acertados
         for a, b in self.fios:
-            p1 = a.rect_img.center
-            p2 = b.rect_text.center
-            pygame.draw.line(tela, (0,150,0), p1, p2, 4)
+            if not a.matched and not b.matched:
+                p1 = a.rect_img.center
+                p2 = b.rect_text.center
+                pygame.draw.line(tela, (0, 150, 0), p1, p2, 4)
 
         # destaca borda vermelha em torno do item selecionado no momento
         for it, tipo in self.selecao:
