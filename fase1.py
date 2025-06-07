@@ -68,24 +68,29 @@ class Fase1:
         ]
 
         # Imagens: 
-        self.img_fnt = pg.image.load("assets/ffnt.png").convert_alpha()
+        self.img_fnt1 = pg.image.load("assets/fnt1.png").convert_alpha()
+        self.img_fnt2 = pg.image.load("assets/fnt2.png").convert_alpha() # referente à lâmpada
         self.img_fft = pg.image.load("assets/fft.png").convert_alpha()
         self.img_fr = pg.image.load("assets/fr.png").convert_alpha()
 
-        self.img_fnt = pg.transform.scale(self.img_fnt, (50,50))
+        self.img_fnt1 = pg.transform.scale(self.img_fnt1, (50,50))
+        self.img_fnt2 = pg.transform.scale(self.img_fnt2, (50,50))
         self.img_fft = pg.transform.scale(self.img_fft, (50,50))
         self.img_fr = pg.transform.scale(self.img_fr, (50,50))
-        self.fnt_usada = False
+        self.fnt1_usada = False
+        self.fnt2_usada = False
         self.fft_usada = False
         self.fr_usada = False
 
         # Retangulo da imagem condutores
-        self.rect_fnt = self.img_fnt.get_rect(topleft=(largura * 0.25, altura * 0.90))
-        self.rect_fft = self.img_fft.get_rect(topleft=(largura * 0.5, altura * 0.90))
-        self.rect_fr =  self.img_fr.get_rect(topleft=(largura * 0.75, altura * 0.90))
+        self.rect_fnt1 = self.img_fnt1.get_rect(topleft=(largura * 0.20, altura * 0.90))
+        self.rect_fnt2 = self.img_fnt2.get_rect(topleft=(largura * 0.40, altura * 0.90))
+        self.rect_fft = self.img_fft.get_rect(topleft=(largura * 0.60, altura * 0.90))
+        self.rect_fr =  self.img_fr.get_rect(topleft=(largura * 0.80, altura * 0.90))
 
         #Estado de arrasto
-        self.arrastando_fnt = False
+        self.arrastando_fnt1 = False
+        self.arrastando_fnt2 = False
         self.arrastando_fft = False
         self.arrastando_fr = False
 
@@ -114,23 +119,41 @@ class Fase1:
                                 #     # print("Conexão inválida:", self.selecao.nome, "→", comp.nome)
                             self.selecao = None
             
-                if self.rect_fnt.collidepoint(evento.pos):
-                    self.arrastando_fnt = True
+                if self.rect_fnt1.collidepoint(evento.pos):
+                    self.arrastando_fnt1 = True
+                elif self.rect_fnt2.collidepoint(evento.pos):
+                    self.arrastando_fnt2 = True
                 elif self.rect_fft.collidepoint(evento.pos):
                     self.arrastando_fft = True
                 elif self.rect_fr.collidepoint(evento.pos):
                     self.arrastando_fr = True
                     
             elif evento.type == pg.MOUSEBUTTONUP:
-                # FNT
-                if self.arrastando_fnt:
-                    self.arrastando_fnt = False 
+                # FNT1
+                if self.arrastando_fnt1:
+                    self.arrastando_fnt1 = False
                     for fio in self.fios:
                         nomes = {fio["origem"].nome, fio["destino"].nome}
-                        if nomes == {"Centro de Carga", "Lâmpada"} and fio["imagem"] is None:
-                            if self._imagem_proxima_da_linha(self.rect_fnt, fio):
-                                fio["imagem"] = self.img_fnt
-                                self.fnt_usada = True
+                        if nomes == {"Centro de Carga", "Lâmpada"}:
+                            if self._imagem_proxima_da_linha(self.rect_fnt1, fio):
+                                if "imagens" not in fio:
+                                    fio["imagens"] = []
+                                if self.img_fnt1 not in fio["imagens"]:  # Evita duplicação
+                                    fio["imagens"].append(self.img_fnt1)
+                                    self.fnt1_usada = True
+                                break
+                # FNT2
+                if self.arrastando_fnt2:
+                    self.arrastando_fnt2 = False
+                    for fio in self.fios:
+                        nomes = {fio["origem"].nome, fio["destino"].nome}
+                        if nomes == {"Centro de Carga", "Lâmpada"}:
+                            if self._imagem_proxima_da_linha(self.rect_fnt2, fio):
+                                if "imagens" not in fio:
+                                    fio["imagens"] = []
+                                if self.img_fnt2 not in fio["imagens"]:  # Evita duplicação
+                                    fio["imagens"].append(self.img_fnt2)
+                                    self.fnt2_usada = True
                                 break
                 
                 # FFT
@@ -138,10 +161,15 @@ class Fase1:
                     self.arrastando_fft = False 
                     for fio in self.fios:
                         nomes = {fio["origem"].nome, fio["destino"].nome}
-                        if nomes == {"Lâmpada", "Tomada"} and fio["imagem"] is None:
+                        if nomes == {"Lâmpada", "Tomada"}:
                             if self._imagem_proxima_da_linha(self.rect_fft, fio):
-                                fio["imagem"] = self.img_fft
-                                self.fft_usada = True
+                                if "imagens" not in fio:
+                                    fio["imagens"] = []
+                                # Gira a imagem 90 graus para a esquerda antes de adicionar
+                                imagem_fft_rotacionada = pg.transform.rotate(self.img_fft, 90)
+                                if imagem_fft_rotacionada not in fio["imagens"]:  # Evita duplicação
+                                    fio["imagens"].append(imagem_fft_rotacionada)
+                                    self.fft_usada = True
                                 break
 
                 # FR
@@ -149,15 +177,21 @@ class Fase1:
                     self.arrastando_fr = False 
                     for fio in self.fios:
                         nomes = {fio["origem"].nome, fio["destino"].nome}
-                        if nomes == {"Lâmpada", "Interruptor"} and fio["imagem"] is None:
+                        if nomes == {"Lâmpada", "Interruptor"}:
                             if self._imagem_proxima_da_linha(self.rect_fr, fio):
-                                fio["imagem"] = self.img_fr
-                                self.fr_usada = True
+                                if "imagens" not in fio:
+                                    fio["imagens"] = []
+                                if self.img_fr not in fio["imagens"]:  # Evita duplicação
+                                    fio["imagens"].append(self.img_fr)
+                                    self.fr_usada = True
                                 break
 
             elif evento.type == pg.MOUSEMOTION:
-                if self.arrastando_fnt:
-                    self.rect_fnt.topleft = evento.pos
+                if self.arrastando_fnt1:
+                    self.rect_fnt1.topleft = evento.pos
+
+                if self.arrastando_fnt2:
+                    self.rect_fnt2.topleft = evento.pos
                 
                 if self.arrastando_fft:
                     self.rect_fft.topleft = evento.pos
@@ -176,6 +210,9 @@ class Fase1:
 
 
     def fio_ja_existe(self, c1, c2):
+
+
+        # Para os demais apenas uma conexao
         return any((fio["origem"] == c1 and fio["destino"] == c2) or 
                    (fio["origem"] == c2 and fio["destino"] == c1) 
                    for fio in self.fios
@@ -199,16 +236,22 @@ class Fase1:
 
     
     def desenhar(self, tela):     
+        # Preencha o fundo inteiro com uma cor clara
+        tela.fill((200, 200, 200))  # Cor de fundo clara
+
+        # Preencha a área superior com branco
+        pg.draw.rect(tela, (255, 255, 255), (0, 0, self.largura, self.espaco_topo))
+
+        # Desenhe a imagem de fundo na área útil
         tela.blit(self.imagem_fundo, (0, self.espaco_topo))
-        # tela.blit(self.imagem_fundo, (0, 0))
 
         # Nome da fase
         fonte = pg.font.SysFont(None, 36)
-        texto = fonte.render("Fase x - Condutores | Componentes", True, (255,255,255))
+        texto = fonte.render("Condutores e Componentes", True, (0, 0, 0))  # Texto preto
         tela.blit(texto, (self.largura // 2 - texto.get_width() // 2, 10))
 
         # Linha separadora abaixo do cabeçalho
-        pg.draw.line(tela, (100, 100, 100), (0, 50), (self.largura, 50), 2)
+        pg.draw.line(tela, (100, 100, 100), (0, self.espaco_topo), (self.largura, self.espaco_topo), 2)
 
         # Bandeja inferior para condutores
         altura_bandeja = 100
@@ -217,21 +260,25 @@ class Fase1:
 
         # Título da área de condutores
         fonte_bandeja = pg.font.SysFont(None, 28)
-        texto = fonte_bandeja.render("Condutores", True, (0, 0, 0))
-        tela.blit(texto, (10, y_bandeja + 10))
+        texto_bandeja = fonte_bandeja.render("Condutores", True, (0, 0, 0))
+        tela.blit(texto_bandeja, (10, y_bandeja + 10))
 
-
+        # Atualize o método de desenho para exibir múltiplas imagens no fio
         for fio in self.fios:
             c1 = fio["origem"]
             c2 = fio["destino"]
             centro1 = c1.ret.center
             centro2 = c2.ret.center
-            pg.draw.line(tela, (0,0,0), centro1, centro2, 3)
+            pg.draw.line(tela, (0, 0, 0), centro1, centro2, 3)
 
-            # Se tiver imagem nesse fio, desenha no meio da linha
-            if fio.get("imagem"):
-                meio = ((centro1[0] + centro2[0]) // 2, (centro1[1] + centro2[1]) // 2)
-                tela.blit(fio["imagem"], meio)
+            # Desenhe todas as imagens associadas ao fio
+            if "imagens" in fio:
+                num_imagens = len(fio["imagens"])
+                for i, imagem in enumerate(fio["imagens"]):
+                    # Posicione as imagens ao longo da linha
+                    pos_x = centro1[0] + (centro2[0] - centro1[0]) * (i + 1) / (num_imagens + 1)
+                    pos_y = centro1[1] + (centro2[1] - centro1[1]) * (i + 1) / (num_imagens + 1)
+                    tela.blit(imagem, (pos_x - imagem.get_width() // 2, pos_y - imagem.get_height() // 2))
 
         # Destaque seleção
         if self.selecao:
@@ -241,8 +288,11 @@ class Fase1:
         for comp in self.componentes:
             comp.desenhar(tela)
         
-        if not self.fnt_usada:
-            tela.blit(self.img_fnt, self.rect_fnt.topleft)
+        if not self.fnt1_usada:
+            tela.blit(self.img_fnt1, self.rect_fnt1.topleft)
+
+        if not self.fnt2_usada:
+            tela.blit(self.img_fnt2, self.rect_fnt2.topleft)
         
         if not self.fft_usada:
             tela.blit(self.img_fft, self.rect_fft.topleft)
