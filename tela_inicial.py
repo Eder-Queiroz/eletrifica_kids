@@ -1,6 +1,7 @@
 import pygame
 
 from fase1 import Fase1
+from fase3 import Fase3
 
 
 class TelaInicial:
@@ -14,7 +15,8 @@ class TelaInicial:
         self.titulo = self.fonte_titulo.render("Eletrifica Kids", True, (255, 255, 255))
         self.opcao1 = self.fonte_opcoes.render("1 - Condutores e Componentes", True, (255, 255, 255))
         self.opcao2 = self.fonte_opcoes.render("2 - Ligando os Circuitos", True, (255, 255, 255))
-        self.instrucao = self.fonte_opcoes.render("Escolha um minijogo (1 ou 2)", True, (255, 255, 0))
+        self.opcao3 = self.fonte_opcoes.render("3 - Símbolos Elétricos", True, (255, 255, 255))
+        self.instrucao = self.fonte_opcoes.render("Escolha um minijogo (1, 2 ou 3)", True, (255, 255, 0))
 
     def atualizar(self, eventos):
         for evento in eventos:
@@ -25,6 +27,8 @@ class TelaInicial:
                     # Importação apenas quando necessária
                     from ligando_os_pontos.minigame import FaseLigandoOsPontos
                     return FaseLigandoOsPontos(self.tela_surface)
+                elif evento.key == pygame.K_3:
+                    return Fase3()
         return None
 
     def desenhar(self, tela):
@@ -37,4 +41,5 @@ class TelaInicial:
         tela.blit(self.titulo, (self.largura//2 - self.titulo.get_width()//2, 100))
         tela.blit(self.opcao1, (self.largura//2 - self.opcao1.get_width()//2, 300))
         tela.blit(self.opcao2, (self.largura//2 - self.opcao2.get_width()//2, 380))
-        tela.blit(self.instrucao, (self.largura//2 - self.instrucao.get_width()//2, 500))
+        tela.blit(self.opcao3, (self.largura//2 - self.opcao3.get_width()//2, 460))
+        tela.blit(self.instrucao, (self.largura//2 - self.instrucao.get_width()//2, 560))

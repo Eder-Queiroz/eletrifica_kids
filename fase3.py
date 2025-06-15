@@ -93,6 +93,10 @@ class Fase3:
 
     def atualizar(self, eventos):
         for ev in eventos:
+            if ev.type == pygame.KEYDOWN and ev.key == pygame.K_ESCAPE:
+                from tela_inicial import TelaInicial
+                return TelaInicial(pygame.display.get_surface())
+
             if ev.type == pygame.MOUSEBUTTONDOWN and ev.button == 1:
                 for item in self.items:
                     # só permite clicar em itens que ainda não foram matched
@@ -134,3 +138,7 @@ class Fase3:
         for it, tipo in self.selecao:
             r = it.rect_img if tipo == "img" else it.rect_text
             pygame.draw.rect(tela, (255,0,0), r, 3)
+
+        fonte_voltar = pygame.font.SysFont(None, 24)
+        texto_voltar = fonte_voltar.render("Pressione ESC para voltar ao menu", True, (0, 0, 0))
+        tela.blit(texto_voltar, (10, 10))

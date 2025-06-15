@@ -2,6 +2,7 @@ import pygame
 
 from ligando_os_pontos.minigame import FaseLigandoOsPontos
 from fase1 import Fase1
+from fase3 import Fase3
 from tela_inicial import TelaInicial
 
 
