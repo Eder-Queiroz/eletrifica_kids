@@ -3,7 +3,6 @@ import pygame
 from fase1 import Fase1
 from fase3 import Fase3
 from cruzadinha.fase4 import Fase4
-from eletroduto.fase5 import Fase5
 
 class TelaInicial:
     def __init__(self, tela_surface):
@@ -18,8 +17,8 @@ class TelaInicial:
         self.opcao2 = self.fonte_opcoes.render("2 - Ligando os Circuitos", True, (255, 255, 255))
         self.opcao3 = self.fonte_opcoes.render("3 - Símbolos Elétricos", True, (255, 255, 255))
         self.opcao4 = self.fonte_opcoes.render("4 - Cruzadinha Elétrica", True, (255, 255, 255))
-        self.opcao5 = self.fonte_opcoes.render("5 - Eletroduto", True, (255, 255, 255))
-        self.instrucao = self.fonte_opcoes.render("Escolha um minijogo (1, 2, 3, 4 ou 5)", True, (255, 255, 0))
+
+        self.instrucao = self.fonte_opcoes.render("Escolha um minijogo (1, 2, 3 ou 4)", True, (255, 255, 0))
 
     def atualizar(self, eventos):
         for evento in eventos:
@@ -34,8 +33,6 @@ class TelaInicial:
                     return Fase3()
                 elif evento.key == pygame.K_4:
                     return Fase4()
-                elif evento.key == pygame.K_5:
-                    return Fase5(self.tela_surface)
         return None
 
     def desenhar(self, tela):
@@ -50,5 +47,6 @@ class TelaInicial:
         tela.blit(self.opcao2, (self.largura//2 - self.opcao2.get_width()//2, 360))
         tela.blit(self.opcao3, (self.largura//2 - self.opcao3.get_width()//2, 420))
         tela.blit(self.opcao4, (self.largura//2 - self.opcao4.get_width()//2, 480))
-        tela.blit(self.opcao5, (self.largura//2 - self.opcao5.get_width()//2, 540))
+        # Removendo a opção 5 da tela
+        # tela.blit(self.opcao5, (self.largura//2 - self.opcao5.get_width()//2, 540))
         tela.blit(self.instrucao, (self.largura//2 - self.instrucao.get_width()//2, 620))
