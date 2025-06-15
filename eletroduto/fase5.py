@@ -8,9 +8,9 @@ class Fase5:
         """Inicializa a fase do eletroduto."""
         self.tela_surface = tela_surface
         if tela_surface:
-            self.largura, self.altura = tela_surface.get_size()
+            self.largura, self.altura = 1280, 800
         else:
-            self.largura, self.altura = 640, 360
+            self.largura, self.altura = 1280, 800
 
         self.clock = pygame.time.Clock()
         self.fps = 60
