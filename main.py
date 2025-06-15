@@ -1,7 +1,7 @@
 import pygame
 
-from tela_inicial import TelaInicial
-from fase1 import Fase1
+from ligando_os_pontos.minigame import FaseLigandoOsPontos
+
 
 class GerenciadorDeCenas:
     def __init__(self):
@@ -10,7 +10,7 @@ class GerenciadorDeCenas:
     def mudar_cena(self, nova_cena):
         self.cena_atual = nova_cena
 
-    # Atualizar eventos na tela    
+    # Atualizar eventos na tela
     def atualizar(self, eventos):
         if self.cena_atual:
             nova_cena = self.cena_atual.atualizar(eventos)
@@ -19,11 +19,12 @@ class GerenciadorDeCenas:
 
     def desenhar(self, tela):
         if self.cena_atual:
-            self.cena_atual.desenhar(tela)
+            self.cena_atual.desenhar()
+
 
 # Inicialização do Pygame
 pygame.init()
-tela = pygame.display.set_mode((800,600))
+tela = pygame.display.set_mode((1280, 800))
 # tela = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
 largura, altura = tela.get_size()
 pygame.display.set_caption("Eletrifica Kids")
@@ -31,7 +32,7 @@ clock = pygame.time.Clock()
 
 # Gerenciador de cenas
 gerenciador = GerenciadorDeCenas()
-gerenciador.mudar_cena(Fase1(largura, altura))
+gerenciador.mudar_cena(FaseLigandoOsPontos(tela))
 
 rodando = True
 while rodando:
@@ -40,9 +41,9 @@ while rodando:
     for evento in eventos:
         if evento.type == pygame.QUIT:
             rodando = False
-    
+
     gerenciador.atualizar(eventos)
-    tela.fill((0, 0, 0)) # Fundo preto
+    tela.fill((0, 0, 0))  # Fundo preto
     gerenciador.desenhar(tela)
     pygame.display.flip()
     clock.tick(60)
