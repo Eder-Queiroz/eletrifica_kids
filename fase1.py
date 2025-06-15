@@ -10,7 +10,7 @@ class Componente:
             self.imagem = pg.transform.rotate(self.imagem, 180)
         elif self.nome == 'Interruptor':
             self.imagem = pg.transform.rotate(self.imagem, 90)
-        
+
         if self.nome == 'Lampada':
             self.ret = self.imagem.get_rect(center=pos)
         else:
@@ -36,12 +36,13 @@ class Componente:
             texto_x -= 20
 
         tela.blit(texto, (texto_x, texto_y))
-        # tela.blit(texto, (self.pos[0] + 10, self.pos[1] + 80)) # abaixo da imagem 
-       
+        # tela.blit(texto, (self.pos[0] + 10, self.pos[1] + 80)) # abaixo da imagem
+
 class Fase1:
     def __init__(self, largura, altura):
         self.largura = largura
         self.altura = altura
+        self.tela = None
 
         # Espaços
         self.espaco_topo = int(self.altura * 0.1)
@@ -57,7 +58,7 @@ class Fase1:
         largura_carga, altura_carga = 60, 100
         largura_lamp, altura_lamp = 100, 80
         largura_int, altura_int = 90, 90
-        largura_tom, altura_tom = 90, 90    
+        largura_tom, altura_tom = 90, 90
 
 
         self.componentes = [
@@ -67,7 +68,7 @@ class Fase1:
             Componente("Tomada",       "assets/tomada_intermediaria.png", largura_tom, altura_tom, (largura // 2 - largura_tom // 2, self.espaco_topo + 10)),
         ]
 
-        # Imagens: 
+        # Imagens:
         self.img_fnt1 = pg.image.load("assets/fnt1.png").convert_alpha()
         self.img_fnt2 = pg.image.load("assets/fnt2.png").convert_alpha() # referente à lâmpada
         self.img_fft = pg.image.load("assets/fft.png").convert_alpha()
@@ -99,6 +100,9 @@ class Fase1:
 
     def atualizar(self, eventos):
         for evento in eventos:
+            if evento.type == pg.KEYDOWN and evento.key == pg.K_ESCAPE:
+                from tela_inicial import TelaInicial
+                return TelaInicial(pg.display.get_surface())
             if evento.type == pg.MOUSEBUTTONDOWN:
                 pos = pg.mouse.get_pos()
                 for comp in self.componentes:
@@ -118,7 +122,7 @@ class Fase1:
                                 # else:
                                 #     # print("Conexão inválida:", self.selecao.nome, "→", comp.nome)
                             self.selecao = None
-            
+
                 if self.rect_fnt1.collidepoint(evento.pos):
                     self.arrastando_fnt1 = True
                 elif self.rect_fnt2.collidepoint(evento.pos):
@@ -127,7 +131,7 @@ class Fase1:
                     self.arrastando_fft = True
                 elif self.rect_fr.collidepoint(evento.pos):
                     self.arrastando_fr = True
-                    
+
             elif evento.type == pg.MOUSEBUTTONUP:
                 # FNT1
                 if self.arrastando_fnt1:
@@ -155,10 +159,10 @@ class Fase1:
                                     fio["imagens"].append(self.img_fnt2)
                                     self.fnt2_usada = True
                                 break
-                
+
                 # FFT
                 if self.arrastando_fft:
-                    self.arrastando_fft = False 
+                    self.arrastando_fft = False
                     for fio in self.fios:
                         nomes = {fio["origem"].nome, fio["destino"].nome}
                         if nomes == {"Lâmpada", "Tomada"}:
@@ -174,7 +178,7 @@ class Fase1:
 
                 # FR
                 if self.arrastando_fr:
-                    self.arrastando_fr = False 
+                    self.arrastando_fr = False
                     for fio in self.fios:
                         nomes = {fio["origem"].nome, fio["destino"].nome}
                         if nomes == {"Lâmpada", "Interruptor"}:
@@ -192,7 +196,7 @@ class Fase1:
 
                 if self.arrastando_fnt2:
                     self.rect_fnt2.topleft = evento.pos
-                
+
                 if self.arrastando_fft:
                     self.rect_fft.topleft = evento.pos
 
@@ -213,11 +217,11 @@ class Fase1:
 
 
         # Para os demais apenas uma conexao
-        return any((fio["origem"] == c1 and fio["destino"] == c2) or 
-                   (fio["origem"] == c2 and fio["destino"] == c1) 
+        return any((fio["origem"] == c1 and fio["destino"] == c2) or
+                   (fio["origem"] == c2 and fio["destino"] == c1)
                    for fio in self.fios
         )
-    
+
     def conexao_valida(self, origem, destino):
         nome1 = origem.nome
         nome2 = destino.nome
@@ -234,8 +238,10 @@ class Fase1:
                     return True
         return False
 
-    
-    def desenhar(self, tela):     
+
+    def desenhar(self, tela):
+        self.tela = tela
+
         # Preencha o fundo inteiro com uma cor clara
         tela.fill((200, 200, 200))  # Cor de fundo clara
 
@@ -287,15 +293,19 @@ class Fase1:
         # Desenha componentes
         for comp in self.componentes:
             comp.desenhar(tela)
-        
+
         if not self.fnt1_usada:
             tela.blit(self.img_fnt1, self.rect_fnt1.topleft)
 
         if not self.fnt2_usada:
             tela.blit(self.img_fnt2, self.rect_fnt2.topleft)
-        
+
         if not self.fft_usada:
             tela.blit(self.img_fft, self.rect_fft.topleft)
 
         if not self.fr_usada:
             tela.blit(self.img_fr, self.rect_fr.topleft)
+
+        fonte_voltar = pg.font.SysFont(None, 24)
+        texto_voltar = fonte_voltar.render("Pressione ESC para voltar ao menu", True, (0, 0, 0))
+        tela.blit(texto_voltar, (10, 10))

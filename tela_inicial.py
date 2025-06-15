@@ -1,23 +1,40 @@
 import pygame
 
-from ligando_os_pontos.minigame import FaseLigandoOsPontos
+from fase1 import Fase1
 
 
 class TelaInicial:
     def __init__(self, tela_surface):
         self.tela_surface = tela_surface
-        self.fonte = pygame.font.Font(None, 48)
-        self.texto = self.fonte.render(
-            "Pressione ESPAÇO para começar", True, (255, 255, 255)
-        )
+        self.largura, self.altura = tela_surface.get_size()
+        self.fonte_titulo = pygame.font.Font(None, 64)
+        self.fonte_opcoes = pygame.font.Font(None, 48)
 
-    # Colocar quaquer interação do usuario com o jogo aqui para ser carregado na tela
+        # Preparar textos
+        self.titulo = self.fonte_titulo.render("Eletrifica Kids", True, (255, 255, 255))
+        self.opcao1 = self.fonte_opcoes.render("1 - Condutores e Componentes", True, (255, 255, 255))
+        self.opcao2 = self.fonte_opcoes.render("2 - Ligando os Circuitos", True, (255, 255, 255))
+        self.instrucao = self.fonte_opcoes.render("Escolha um minijogo (1 ou 2)", True, (255, 255, 0))
+
     def atualizar(self, eventos):
         for evento in eventos:
-            if evento.type == pygame.KEYDOWN and evento.key == pygame.K_SPACE:
-                return FaseLigandoOsPontos(self.tela_surface)  # Transição para a Fase1
-            return None
+            if evento.type == pygame.KEYDOWN:
+                if evento.key == pygame.K_1:
+                    return Fase1(self.largura, self.altura)
+                elif evento.key == pygame.K_2:
+                    # Importação apenas quando necessária
+                    from ligando_os_pontos.minigame import FaseLigandoOsPontos
+                    return FaseLigandoOsPontos(self.tela_surface)
         return None
 
     def desenhar(self, tela):
-        tela.blit(self.texto, (150, 250))  # Exibe o texto na tela
+        # Desenha fundo com gradiente
+        for y in range(0, self.altura):
+            cor = (0, max(0, 30-y//15), max(0, 60-y//10))
+            pygame.draw.line(tela, cor, (0, y), (self.largura, y))
+
+        # Posições dos textos
+        tela.blit(self.titulo, (self.largura//2 - self.titulo.get_width()//2, 100))
+        tela.blit(self.opcao1, (self.largura//2 - self.opcao1.get_width()//2, 300))
+        tela.blit(self.opcao2, (self.largura//2 - self.opcao2.get_width()//2, 380))
+        tela.blit(self.instrucao, (self.largura//2 - self.instrucao.get_width()//2, 500))

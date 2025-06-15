@@ -1,3 +1,8 @@
+# Adicione esta importação no início do arquivo
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from tela_inicial import TelaInicial
 from enum import Enum, auto
 from typing import Optional, List, Dict, Tuple, Any
 
@@ -581,8 +586,6 @@ class FaseLigandoOsPontos:
             for event in events:
                 if event.type == pygame.QUIT:
                     running = False
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                    running = False
 
             self.atualizar(events)
             self.desenhar()
@@ -591,13 +594,15 @@ class FaseLigandoOsPontos:
     def atualizar(self, events: List[pygame.event.Event]):
         """Atualiza o estado do jogo a cada frame."""
         if self.vitoria_alcancada:
-            self._handle_events_victory(events)
-            return
+            return self._handle_events_victory(events)
 
         mouse_pos = pygame.mouse.get_pos()
         self._update_hover_status(mouse_pos)
-        self._handle_events_playing(events)
+        nova_cena = self._handle_events_playing(events)  # Captura o retorno
+        if nova_cena:  # Se houver uma nova cena, retorne-a
+            return nova_cena
         self._update_drag_state(mouse_pos)
+        return None
 
     def _handle_events_playing(self, events: List[pygame.event.Event]):
         """Processa a entrada do usuário durante o jogo."""
@@ -605,6 +610,12 @@ class FaseLigandoOsPontos:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_r:
                     self._setup_scene_from_config(SCENE_CONFIG)
+                elif event.key == pygame.K_ESCAPE:
+                    # Importação apenas quando necessário para evitar ciclo
+                    import sys
+                    sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+                    from tela_inicial import TelaInicial
+                    return TelaInicial(self.surface)
 
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if self.hovered_terminal:
@@ -656,6 +667,12 @@ class FaseLigandoOsPontos:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_r:
                     self._setup_scene_from_config(SCENE_CONFIG)
+                elif event.key == pygame.K_ESCAPE:
+                    import sys
+                    sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+                    from tela_inicial import TelaInicial
+                    return TelaInicial(self.surface)
+        return None
 
     def _update_hover_status(self, mouse_pos: Tuple[int, int]):
         """Verifica se o mouse está sobre um terminal válido."""
@@ -681,8 +698,12 @@ class FaseLigandoOsPontos:
         if self.dragging_wire:
             self.dragging_wire.mouse_pos = mouse_pos
 
-    def desenhar(self):
+    def desenhar(self, tela=None):
         """Desenha todos os elementos da cena na tela."""
+
+        if tela is None:
+            tela = self.surface
+
         self.surface.fill(COLOR_BACKGROUND)
         self._draw_sources()
         self._draw_circuit_labels()
@@ -696,6 +717,11 @@ class FaseLigandoOsPontos:
 
         if self.vitoria_alcancada:
             self._draw_victory_message()
+
+         # Adicionar instruções para voltar ao menu
+        fonte_voltar = pygame.font.Font(None, 24)
+        texto_voltar = fonte_voltar.render("Pressione ESC para voltar ao menu", True, COLOR_WHITE)
+        self.surface.blit(texto_voltar, (10, 10))
 
     def _draw_sources(self):
         """Desenha as fontes de energia na parte superior."""

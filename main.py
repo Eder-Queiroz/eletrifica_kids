@@ -1,6 +1,8 @@
 import pygame
 
 from ligando_os_pontos.minigame import FaseLigandoOsPontos
+from fase1 import Fase1
+from tela_inicial import TelaInicial
 
 
 class GerenciadorDeCenas:
@@ -19,7 +21,7 @@ class GerenciadorDeCenas:
 
     def desenhar(self, tela):
         if self.cena_atual:
-            self.cena_atual.desenhar()
+            self.cena_atual.desenhar(tela)
 
 
 # Inicialização do Pygame
@@ -32,7 +34,7 @@ clock = pygame.time.Clock()
 
 # Gerenciador de cenas
 gerenciador = GerenciadorDeCenas()
-gerenciador.mudar_cena(FaseLigandoOsPontos(tela))
+gerenciador.mudar_cena(TelaInicial(tela))
 
 rodando = True
 while rodando:
